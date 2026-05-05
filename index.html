@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>らいたぷ — 英検ライティング AI採点</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===== LANDING SCREEN ===== -->
+<div id="screen-landing">
+  <nav class="nav">
+    <div class="logo-wrap">
+      <span class="logo-text">らいたぷ</span>
+      <span class="logo-sub">WRITAPU</span>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <div class="hero-title">らいたぷ</div>
+        <div class="hero-sub-en">WRITAPU</div>
+        <p class="hero-desc">
+          英検ライティングの練習に特化したサービスです。<br>
+          問題を読んで英文を書くと、AIが英検公式の<br>
+          採点基準をもとに採点・コメントします。<br>
+          英検3級・準2級の意見論述・Eメール問題に対応。
+        </p>
+        <button class="btn-primary" id="landing-cta">APIキーを設定して始める →</button>
+        <div class="btn-note">登録不要・無料でお試しいただけます</div>
+      </div>
+      <div class="hero-right">
+        <div class="preview-label">PREVIEW</div>
+        <div class="preview-card">
+          <div class="pv-nav">
+            <span class="pv-logo">らいたぷ</span>
+            <span class="pv-logo-sub">WRITAPU</span>
+          </div>
+          <div class="pv-body">
+            <div class="pv-sec">
+              <div class="pv-sec-head"><span class="pv-sec-name">QUESTION</span></div>
+              <div class="pv-sec-body">
+                <div class="pv-q-text">Do you think students should take part in club activities at school?</div>
+                <div class="pv-q-note">語数の目安：50〜60語</div>
+              </div>
+            </div>
+            <div class="pv-sec">
+              <div class="pv-sec-head">
+                <span class="pv-sec-name">YOUR ANSWER</span>
+                <span style="margin-left:auto;font-size:8px;color:#5a8fc4;font-weight:700">54語</span>
+              </div>
+              <div class="pv-sec-body">
+                <textarea class="pv-ta" readonly>I agree that students should join club activities. First, they can make many friends. Second, they learn teamwork skills useful in the future.</textarea>
+              </div>
+            </div>
+            <div class="pv-sec">
+              <div class="pv-sec-head">
+                <span class="pv-sec-name">採点結果</span>
+                <span style="margin-left:auto"><span class="pv-score">14</span><span class="pv-denom"> / 16</span></span>
+              </div>
+              <div class="pv-sec-body">
+                <table class="pv-tbl">
+                  <tr>
+                    <td><span class="pv-pill" style="background:#e8f0f9;color:#4a7db0">内容</span></td>
+                    <td class="pv-frac" style="color:#5a8fc4">4<span class="pv-frac-den">/4</span></td>
+                    <td class="pv-cmt">意見と理由2つが明確です。</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pv-pill" style="background:#e8f5ee;color:#3a8a5a">構成</span></td>
+                    <td class="pv-frac" style="color:#4aaa6a">4<span class="pv-frac-den">/4</span></td>
+                    <td class="pv-cmt">接続表現が効果的です。</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pv-pill" style="background:#fef4e0;color:#b07820">語彙</span></td>
+                    <td class="pv-frac" style="color:#e09a30">3<span class="pv-frac-den">/4</span></td>
+                    <td class="pv-cmt">多様な語彙を意識して。</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pv-pill" style="background:#fceaea;color:#b04040">文法</span></td>
+                    <td class="pv-frac" style="color:#d06060">3<span class="pv-frac-den">/4</span></td>
+                    <td class="pv-cmt">複雑な文構造を取り入れて。</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div class="pv-sec">
+              <div class="pv-sec-head"><span class="pv-sec-name">文法・スペルチェック</span></div>
+              <div class="pv-sec-body">
+                <div class="pv-err-item">三単現のsの欠落：sound → sounds</div>
+              </div>
+            </div>
+            <div class="pv-cbox">意見・構成ともにしっかり整った答案です。語彙・文法はより多様な表現を意識するとさらに得点が上がります。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="how">
+    <div class="how-inner">
+      <div class="sec-title">使い方</div>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-num">1</div>
+          <div class="how-step-title">APIキーを取得</div>
+          <div class="how-step-desc">Google AI Studioで無料取得。Googleアカウントがあればすぐ発行できます。</div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">2</div>
+          <div class="how-step-title">らいたぷに登録</div>
+          <div class="how-step-desc">キーを貼り付けて保存するだけ。アカウント登録は不要です。</div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">3</div>
+          <div class="how-step-title">英文を書いて採点</div>
+          <div class="how-step-desc">問題を選んで書いたら「採点する」ボタンを押すだけ。</div>
+        </div>
+      </div>
+      <div class="how-note">
+        <strong>自分自身のAPIキーを使う仕組みです。</strong><br>
+        らいたぷはGoogle Gemini APIを使って採点します。サービス側でAPIコストを負担しない代わりに、ご自身のGoogleアカウントのAPIキーを使っていただく形をとっています。Google AI Studioの無料枠（1日20回程度）を使用します。
+      </div>
+    </div>
+  </div>
+
+  <div class="cta">
+    <button class="cta-btn" id="landing-cta2">APIキーを設定して始める →</button>
+    <div class="cta-sub">登録不要・アカウントなし・完全無料でお試しいただけます</div>
+  </div>
+</div>
+
+<!-- ===== MAIN SCREEN ===== -->
+<div id="screen-main" style="display:none">
+  <nav class="nav">
+    <div class="logo-wrap">
+      <span class="logo-text">らいたぷ</span>
+      <span class="logo-sub">WRITAPU</span>
+    </div>
+    <button class="nav-link" id="nav-settings">⚙ API設定</button>
+  </nav>
+
+  <div class="api-ok-bar">
+    <span>✓ APIキーが設定されています</span>
+    <div class="api-ok-right">
+      <button class="api-ok-change" id="api-change-btn">変更する</button>
+      <button class="api-delete-btn" id="api-delete-btn">🗑 APIキーを削除</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+    <div class="main-inner">
+      <div class="sel-row">
+        <span class="sel-label">級・問題種別：</span>
+        <select class="grade-sel" id="grade-select">
+          <option value="p2-opinion">準2級 — 意見論述</option>
+          <option value="p2-email">準2級 — Eメール</option>
+          <option value="3-opinion">3級 — 意見論述</option>
+          <option value="3-email">3級 — Eメール</option>
+          <option disabled>2級以上（近日対応）</option>
+        </select>
+      </div>
+
+      <div class="blocks-wrap">
+        <!-- QUESTION block -->
+        <div class="s-block">
+          <div class="s-head"><span class="s-name">QUESTION</span></div>
+          <div class="q-body" id="question-body"></div>
+        </div>
+
+        <!-- YOUR ANSWER block -->
+        <div class="s-block">
+          <div class="s-head"><span class="s-name">YOUR ANSWER</span></div>
+          <div class="ans-body">
+            <div class="ans-top">
+              <div class="wc"><span id="word-count">0</span>語</div>
+            </div>
+            <div class="email-reply-open" id="email-reply-open" style="display:none">
+              <div id="email-reply-salutation" class="email-reply-salutation"></div>
+              <div class="email-reply-thanks">Thank you for your e-mail.</div>
+            </div>
+            <textarea
+              class="ans-ta"
+              id="answer-ta"
+              spellcheck="false"
+              autocorrect="off"
+              autocomplete="off"
+              placeholder="ここに英文を入力してください。"
+            ></textarea>
+            <div class="email-reply-close" id="email-reply-close" style="display:none">Best wishes,</div>
+            <div class="ans-foot">
+              <span class="ans-note">スペルチェック・自動修正はオフにしています</span>
+              <button class="submit-btn" id="submit-btn">採点する →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOADING block -->
+        <div class="s-block" id="loading-block" style="display:none">
+          <div class="loading-wrap">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">AIが採点しています…</div>
+          </div>
+        </div>
+
+        <!-- RESULT block -->
+        <div class="s-block" id="result-block" style="display:none">
+          <div class="s-head"><span class="s-name">採点結果</span></div>
+          <div class="res-body" id="result-body"></div>
+        </div>
+
+        <!-- ERRORS block -->
+        <div class="s-block" id="errors-block" style="display:none">
+          <div class="s-head"><span class="s-name">文法・スペルチェック</span></div>
+          <div class="com-body">
+            <div class="errors-none" id="errors-none">文法・スペルの誤りは見つかりませんでした</div>
+            <ul class="errors-list" id="errors-list"></ul>
+          </div>
+        </div>
+
+        <!-- OVERALL COMMENT block -->
+        <div class="s-block" id="overall-block" style="display:none">
+          <div class="s-head"><span class="s-name">総合コメント</span></div>
+          <div class="com-body">
+            <div id="overall-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS SCREEN ===== -->
+<div id="screen-settings" style="display:none">
+  <nav class="nav">
+    <div class="logo-wrap">
+      <span class="logo-text">らいたぷ</span>
+      <span class="logo-sub">WRITAPU</span>
+    </div>
+    <button class="nav-link" id="settings-back">← 採点画面に戻る</button>
+  </nav>
+
+  <div class="set-wrap">
+    <div>
+      <div class="page-title">API設定</div>
+      <div class="page-sub">
+        Google Gemini APIキーを設定することで、採点機能が使えるようになります。<br>
+        設定前に以下の内容をご確認ください。
+      </div>
+    </div>
+
+    <!-- Agree card -->
+    <div class="set-card">
+      <div class="set-card-title">ご利用の前に</div>
+      <div class="agree-list" id="agree-list">
+        <div class="ag-item" data-idx="0">
+          <div class="cb" id="cb0"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-warn">採点について</div><br>
+            採点はAIが英検公式の採点基準を参照して行いますが、<strong>本番試験の採点と同一であることは保証されません。</strong>また、このサービスは合格を保証するものではありません。
+          </div>
+        </div>
+        <div class="ag-item" data-idx="1">
+          <div class="cb" id="cb1"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-use">利用枠・費用</div><br>
+            設定するAPIキーは<strong>ご自身のGoogleアカウントのAPI利用枠・費用に影響します。</strong>無料枠の範囲内であれば費用は発生しませんが、有料プランのご利用中や無料枠を超えた場合は費用が発生することがあります。ご自身の利用状況をご確認ください。
+          </div>
+        </div>
+        <div class="ag-item" data-idx="2">
+          <div class="cb" id="cb2"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-priv">プライバシー</div><br>
+            APIキーは<strong>端末ごとに設定が必要</strong>です。複数の端末で利用する場合はそれぞれで設定してください。
+          </div>
+        </div>
+        <div class="ag-item" data-idx="3">
+          <div class="cb" id="cb3"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-priv">プライバシー</div><br>
+            APIキーは<strong>お使いのブラウザのLocalStorage（端末内）にのみ保存</strong>され、サーバーには送信・保存されません。
+          </div>
+        </div>
+        <div class="ag-item" data-idx="4">
+          <div class="cb" id="cb4"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-sec">セキュリティ</div><br>
+            APIキーは<strong>第三者に教えないでください。</strong>漏洩・不正利用による損害について、当サービスは責任を負いません。
+          </div>
+        </div>
+        <div class="ag-item" data-idx="5">
+          <div class="cb" id="cb5"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-sec">セキュリティ</div><br>
+            <strong>共有パソコンやスマートフォンでの利用は推奨しません。</strong>共有端末ではAPIキーが第三者に悪用される可能性があります。どうしても使用する場合は、使用後に必ず「APIキーを削除」ボタンでキーを削除してください。
+          </div>
+        </div>
+        <div class="ag-item" data-idx="6">
+          <div class="cb" id="cb6"></div>
+          <div class="ag-txt">
+            <div class="ag-tag tag-use">データ学習</div><br>
+            Google AI Studioの無料枠利用時は、<strong>入力した英文がGoogleのAI学習に使用される可能性</strong>があります。本番試験の答案や個人情報を含む文章は入力しないでください。
+          </div>
+        </div>
+      </div>
+      <div class="all-row" id="all-row">
+        <div class="all-cb" id="cbAll"></div>
+        <div class="all-txt">上記すべてに同意する</div>
+      </div>
+    </div>
+
+    <!-- Guide card (API key input is inline in step 3) -->
+    <div class="set-card">
+      <div class="set-card-title">APIキーの取得方法</div>
+      <div class="guide-steps">
+        <div class="g-step">
+          <div class="g-num">1</div>
+          <div>
+            <div class="g-title">Google AI Studioにアクセス</div>
+            <div class="g-desc">
+              <a class="g-link" href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:inline-block;vertical-align:middle;margin-left:2px;position:relative;top:-1px"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a> を開き、Googleアカウントでログインしてください。
+            </div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-num">2</div>
+          <div style="flex:1">
+            <div class="g-title">APIキーを作成</div>
+            <div class="g-desc">左メニューの「Get API key」→「APIキーを作成」をクリック。キーが発行されたら「キーをコピー」でコピーします。</div>
+            <div class="g-screenshots">
+              <img src="img/api-setup-01-aistudio-top.png" alt="Get API key をクリック">
+              <img src="img/api-setup-02-key-list.png" alt="APIキーを作成 をクリック">
+              <img src="img/api-setup-03-create-dialog.png" alt="キーを作成 をクリック">
+              <img src="img/api-setup-04-copy-key.png" alt="キーをコピー をクリック">
+            </div>
+          </div>
+        </div>
+        <div class="g-step">
+          <div class="g-num">3</div>
+          <div style="flex:1">
+            <div class="g-title">らいたぷに貼り付けて保存</div>
+            <div class="g-desc">コピーしたキーを以下に貼り付けて「保存」ボタンを押してください。次回以降は自動で読み込まれます。</div>
+            <div class="g-inline-form">
+              <div class="api-lbl">Gemini APIキー</div>
+              <div class="api-inp-wrap">
+                <input class="api-inp" id="api-inp" type="password" placeholder="AIza..." disabled />
+                <button class="save-btn" id="save-api-btn" disabled>保存</button>
+              </div>
+              <div class="api-note">キーはお使いのブラウザ内にのみ保存されます。サーバーには送信されません。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lim-grid">
+        <div class="lim-item">
+          <div class="lim-lbl">使用モデル</div>
+          <div class="lim-val">Gemini 2.5 Flash</div>
+        </div>
+        <div class="lim-item lim-item--warn">
+          <div class="lim-lbl">無料枠の上限</div>
+          <div class="lim-val">1日 20回</div>
+        </div>
+      </div>
+      <div class="lim-note">無料枠は1日あたり20回までです。上限に達した場合は翌日にリセットされます。</div>
+    </div>
+  </div>
+</div>
+
+<script src="questions.js"></script>
+<script src="prompts.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
