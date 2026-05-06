@@ -207,6 +207,53 @@ body {
 }
 .how-note strong { font-weight: 700; color: #2a3a50; }
 
+/* ===== ABOUT SCORING ACCORDION ===== */
+.about-scoring {
+  background: #f8fafd;
+  border-top: 0.5px solid #e0e8f0;
+  border-bottom: 0.5px solid #e0e8f0;
+  padding: 28px 32px;
+}
+.about-scoring-inner { max-width: 720px; margin: 0 auto; }
+.about-scoring-intro {
+  font-size: 14px;
+  color: #4a5a70;
+  line-height: 1.8;
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+.scoring-details { border: none; }
+.scoring-summary {
+  font-size: 13px;
+  font-weight: 700;
+  color: #5a8fc4;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.scoring-summary::-webkit-details-marker { display: none; }
+.scoring-arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.scoring-details[open] .scoring-arrow { transform: rotate(90deg); }
+.scoring-body {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e8eef6;
+}
+.scoring-body p {
+  font-size: 13px;
+  color: #4a5a70;
+  line-height: 1.85;
+  margin: 0 0 12px;
+}
+.scoring-body p:last-child { margin-bottom: 0; }
+
 /* CTA section */
 .cta {
   background: #F0F4F8;
