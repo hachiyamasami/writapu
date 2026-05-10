@@ -55,6 +55,7 @@ const CRITERIA = {
 // === State ===
 let currentGradeType = 'p2-opinion';
 let currentQuestion = null;
+let isCustomMode = false;
 let settingsStates = Array(7).fill(false);
 
 // === DOM helper ===
@@ -88,7 +89,11 @@ function handleGradeChange() {
   $('answer-ta').value = '';
   updateWordCount();
   hideResults();
-  loadNewQuestion();
+  if (isCustomMode) {
+    renderCustomQuestion();
+  } else {
+    loadNewQuestion();
+  }
 }
 
 function loadNewQuestion() {
@@ -101,12 +106,28 @@ function loadNewQuestion() {
   hideResults();
 }
 
-function renderQuestion() {
-  const type = currentGradeType;
-  const q = currentQuestion;
-  const isEmail = type.includes('email');
+function toggleCustomMode() {
+  isCustomMode = !isCustomMode;
+  const btn = $('custom-mode-btn');
+  btn.textContent = isCustomMode ? '↺ ランダム出題に戻る' : '✏ 自分で問題を入力する';
+  btn.classList.toggle('active', isCustomMode);
+  $('answer-ta').value = '';
+  updateWordCount();
+  hideResults();
+  if (isCustomMode) {
+    renderCustomQuestion();
+  } else {
+    loadNewQuestion();
+  }
+}
 
-  let inst = '';
+function senderName() {
+  return currentGradeType === '3-email' ? 'James' : 'Alex';
+}
+
+function buildInstHtml() {
+  const type = currentGradeType;
+  let inst = [];
   if (type === 'p2-opinion') {
     inst = [
       'あなたは，外国人の知り合いから以下のQUESTIONをされました。',
@@ -136,8 +157,110 @@ function renderQuestion() {
       '解答がJamesのEメールに対応していないと判断された場合は，<u>0点と採点されることがあります。</u>',
     ];
   }
+  return '<ul class="q-inst">' + inst.map(s => `<li>${s}</li>`).join('') + '</ul>';
+}
 
-  const instHtml = '<ul class="q-inst">' + inst.map(s => `<li>${s}</li>`).join('') + '</ul>';
+function renderCustomQuestion() {
+  const isEmail = currentGradeType.includes('email');
+  const sender = senderName();
+  const instHtml = buildInstHtml();
+
+  let contentHtml = '';
+  if (isEmail) {
+    const is3Email = currentGradeType === '3-email';
+    const underlinePlaceholder = is3Email
+      ? '下線を引きたい質問文を入力（複数ある場合は改行で区切る）'
+      : '下線を引きたい語句を入力（例: a farmers\' market）';
+    contentHtml = `<div class="q-blk">
+      <div class="email-box custom-email-box">
+        <div class="email-from">From: ${sender}</div>
+        <div class="custom-email-fixed">Hi,</div>
+        <textarea class="q-custom-ta" id="custom-question-ta" placeholder="ここにEメールの本文を入力してください..."></textarea>
+        <div class="custom-email-fixed">Your friend,<br>${sender}</div>
+      </div>
+      <div class="custom-underline-wrap">
+        <span class="custom-underline-label">下線部</span>
+        <textarea class="custom-underline-ta" id="custom-underline-ta" rows="2" placeholder="${underlinePlaceholder}"></textarea>
+        <p class="custom-underline-note">本文中の文字列と完全一致させてください。採点で下線部として扱われます。</p>
+      </div>
+    </div>`;
+  } else {
+    contentHtml = `<div class="q-blk">
+      <div class="q-lbl">QUESTION</div>
+      <textarea class="q-custom-ta" id="custom-question-ta" placeholder="ここに問題文を入力してください..."></textarea>
+    </div>`;
+  }
+
+  $('question-body').innerHTML = instHtml + contentHtml;
+
+  const open = $('email-reply-open');
+  const close = $('email-reply-close');
+  const ta = $('answer-ta');
+  if (isEmail) {
+    $('email-reply-salutation').textContent = `Hi, ${sender}!`;
+    open.style.display = 'block';
+    close.style.display = 'block';
+    ta.classList.add('email-mode');
+  } else {
+    open.style.display = 'none';
+    close.style.display = 'none';
+    ta.classList.remove('email-mode');
+  }
+}
+
+function trimEmailWrapper(text, sender) {
+  // "From: ..." 行を除去
+  text = text.replace(/^From:\s*\S+[^\n]*\n?/i, '');
+  // "Hi!" / "Hi," / "Hi, Name!" などを除去
+  text = text.replace(/^Hi[,!]?\s*(?:,?\s*\w+\s*!?)?\s*\n?/i, '');
+  // 末尾の "Your friend, / Name" を除去
+  text = text.replace(/\n?Your friend,?\s*\n?\s*\w+\s*$/i, '');
+  // 末尾の "Best wishes, / Name" を除去
+  text = text.replace(/\n?Best wishes,?\s*\n?\s*\w+\s*$/i, '');
+  return text.trim();
+}
+
+function buildCustomQuestion() {
+  const type = currentGradeType;
+  const isEmail = type.includes('email');
+  const ta = $('custom-question-ta');
+  if (!ta || !ta.value.trim()) return null;
+
+  if (isEmail) {
+    const sender = senderName();
+    const body = trimEmailWrapper(ta.value.trim(), sender);
+    const wordMin = type === 'p2-email' ? 40 : 15;
+    const wordMax = type === 'p2-email' ? 50 : 25;
+
+    let bodyHtml = body.replace(/\n/g, '<br>');
+    const underlineTa = $('custom-underline-ta');
+    if (underlineTa && underlineTa.value.trim()) {
+      const parts = underlineTa.value.split('\n').map(s => s.trim()).filter(Boolean);
+      parts.forEach(part => {
+        const escaped = part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        bodyHtml = bodyHtml.replace(new RegExp(escaped, 'g'), `<u>${part}</u>`);
+      });
+    }
+
+    return {
+      from: sender,
+      body: `Hi,<br><br>${bodyHtml}<br><br>Your friend,<br>${sender}`,
+      wordMin,
+      wordMax,
+    };
+  } else {
+    const wordMin = type === 'p2-opinion' ? 50 : 25;
+    const wordMax = type === 'p2-opinion' ? 60 : 35;
+    return { text: ta.value.trim(), wordMin, wordMax };
+  }
+}
+
+function renderQuestion() {
+  const type = currentGradeType;
+  const q = currentQuestion;
+  const isEmail = type.includes('email');
+
+  const instHtml = buildInstHtml();
 
   let contentHtml = '';
   if (isEmail) {
@@ -187,6 +310,12 @@ async function handleSubmit() {
   const answerText = $('answer-ta').value.trim();
   if (!answerText) { alert('英文を入力してください。'); return; }
 
+  let questionForScoring = currentQuestion;
+  if (isCustomMode) {
+    questionForScoring = buildCustomQuestion();
+    if (!questionForScoring) { alert('問題文を入力してください。'); return; }
+  }
+
   const btn = $('submit-btn');
   btn.disabled = true;
   btn.textContent = '採点中…';
@@ -194,7 +323,7 @@ async function handleSubmit() {
   $('loading-block').style.display = 'block';
 
   try {
-    const result = await scoreAnswer(apiKey, currentGradeType, currentQuestion, answerText);
+    const result = await scoreAnswer(apiKey, currentGradeType, questionForScoring, answerText);
     $('loading-block').style.display = 'none';
     renderResult(result);
     $('result-block').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -351,6 +480,9 @@ function init() {
 
   // Grade selector
   $('grade-select').addEventListener('change', handleGradeChange);
+
+  // Custom mode toggle
+  $('custom-mode-btn').addEventListener('click', toggleCustomMode);
 
   // Answer textarea
   $('answer-ta').addEventListener('input', updateWordCount);
