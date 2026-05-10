@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>らいたぷ — 英検ライティング・英作文 AI採点【無料】</title>
-  <meta name="description" content="英検3級・準2級のライティング（英作文）をAIが即採点。意見論述・Eメール問題に対応。採点基準に沿ったフィードバックで弱点が分かる。登録不要・完全無料。">
+  <meta name="description" content="英検3級・準2級のライティング（英作文）をAIが即採点。英作文・Eメール問題に対応。採点基準に沿ったフィードバックで弱点が分かる。登録不要・完全無料。">
   <meta property="og:title" content="らいたぷ — 英検ライティング・英作文 AI採点【無料】">
-  <meta property="og:description" content="英検3級・準2級のライティング（英作文）をAIが即採点。意見論述・Eメール問題に対応。採点基準に沿ったフィードバックで弱点が分かる。登録不要・完全無料。">
+  <meta property="og:description" content="英検3級・準2級のライティング（英作文）をAIが即採点。英作文・Eメール問題に対応。採点基準に沿ったフィードバックで弱点が分かる。登録不要・完全無料。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://write.eitapu.com/">
   <meta name="twitter:card" content="summary_large_image">
@@ -42,7 +42,7 @@
           英検ライティングの練習に特化したサービスです。<br>
           問題を読んで英文を書くと、AIが英検公式の<br>
           採点基準をもとに採点・コメントします。<br>
-          英検3級・準2級の意見論述・Eメール問題に対応。
+          英検3級・準2級の英作文・Eメール問題に対応。
         </p>
         <button class="btn-primary" id="landing-cta">APIキーを設定して始める →</button>
         <div class="btn-note">登録不要・アカウントなし・完全無料でご利用いただけます</div>
@@ -199,9 +199,9 @@
       <div class="sel-row">
         <span class="sel-label">級・問題種別：</span>
         <select class="grade-sel" id="grade-select">
-          <option value="p2-opinion">準2級 — 意見論述</option>
+          <option value="p2-opinion">準2級 — 英作文</option>
           <option value="p2-email">準2級 — Eメール</option>
-          <option value="3-opinion">3級 — 意見論述</option>
+          <option value="3-opinion">3級 — 英作文</option>
           <option value="3-email">3級 — Eメール</option>
           <option disabled>2級以上（近日対応）</option>
         </select>
@@ -271,6 +271,12 @@
           <div class="com-body">
             <div id="overall-text"></div>
           </div>
+        </div>
+
+        <!-- SHARE block -->
+        <div class="s-block" id="share-block" style="display:none">
+          <div class="s-head"><span class="s-name">SHARE</span></div>
+          <div class="share-body" id="share-body"></div>
         </div>
 
       </div>

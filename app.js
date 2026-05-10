@@ -52,6 +52,15 @@ const CRITERIA = {
   ],
 };
 
+// === Constants ===
+const SITE_URL = 'https://write.eitapu.com';
+const GRADE_LABEL = {
+  'p2-opinion': '準2級 英作文',
+  'p2-email':   '準2級 Eメール',
+  '3-opinion':  '3級 英作文',
+  '3-email':    '3級 Eメール',
+};
+
 // === State ===
 let currentGradeType = 'p2-opinion';
 let currentQuestion = null;
@@ -301,6 +310,7 @@ function hideResults() {
   $('errors-block').style.display = 'none';
   $('overall-block').style.display = 'none';
   $('loading-block').style.display = 'none';
+  $('share-block').style.display = 'none';
 }
 
 async function handleSubmit() {
@@ -364,7 +374,6 @@ function renderResult(result) {
         <span class="total-den">/${maxTotal}</span>
         <span class="total-lbl">点</span>
       </div>
-      <button class="print-btn" onclick="window.print()">🖨 印刷</button>
     </div>
     <table>
       <thead>
@@ -405,6 +414,204 @@ function renderResult(result) {
   const overall = esc(result.overall);
   $('overall-text').innerHTML = overall ? `<div class="overall-comment">${overall}</div>` : '';
   $('overall-block').style.display = 'block';
+
+  // share block
+  renderShareSection(total, maxTotal, result.scores || {});
+  $('share-block').style.display = 'block';
+}
+
+// === Share ===
+function buildShareText(total, maxTotal) {
+  const label = GRADE_LABEL[currentGradeType] || '';
+  return `英検${label}で${total}/${maxTotal}点でした！\nらいたぷで英検ライティングを練習しよう📝\n#らいたぷ #英検 #タイピング\n登録不要・完全無料 👉 ${SITE_URL}`;
+}
+
+function drawRoundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+async function generateScoreCard(total, maxTotal, scores) {
+  const W = 1200, H = 630;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 背景グラデーション
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#5ab0d4');
+  bg.addColorStop(1, '#9B6FD6');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // 白カード
+  ctx.fillStyle = 'white';
+  drawRoundRect(ctx, 80, 60, 1040, 510, 24);
+  ctx.fill();
+
+  const cx = W / 2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  // アプリ名
+  ctx.font = 'bold 34px sans-serif';
+  ctx.fillStyle = '#5ab0d4';
+  ctx.fillText('らいたぷ', cx, 120);
+
+  // 英検グレードラベル
+  ctx.font = '500 24px sans-serif';
+  ctx.fillStyle = '#8fa0b4';
+  ctx.fillText(`英検 ${GRADE_LABEL[currentGradeType] || ''}`, cx, 162);
+
+  // 区切り線1
+  ctx.strokeStyle = '#e8edf5';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(200, 186);
+  ctx.lineTo(1000, 186);
+  ctx.stroke();
+
+  // 合計スコア（中央揃え）
+  const scoreStr = String(total);
+  const divStr = ` / ${maxTotal}`;
+  ctx.font = 'bold 120px sans-serif';
+  const scoreW = ctx.measureText(scoreStr).width;
+  ctx.font = 'bold 60px sans-serif';
+  const divW = ctx.measureText(divStr).width;
+  const startX = cx - (scoreW + divW) / 2;
+
+  ctx.font = 'bold 120px sans-serif';
+  ctx.fillStyle = '#2a3a50';
+  ctx.textAlign = 'left';
+  ctx.fillText(scoreStr, startX, 325);
+
+  ctx.font = 'bold 60px sans-serif';
+  ctx.fillStyle = '#A0AEC0';
+  ctx.fillText(divStr, startX + scoreW, 325);
+
+  ctx.font = '500 24px sans-serif';
+  ctx.fillStyle = '#8fa0b4';
+  ctx.textAlign = 'center';
+  ctx.fillText('点', cx, 370);
+
+  // 区切り線2
+  ctx.strokeStyle = '#e8edf5';
+  ctx.beginPath();
+  ctx.moveTo(180, 396);
+  ctx.lineTo(1020, 396);
+  ctx.stroke();
+
+  // 観点別内訳
+  const crit = CRITERIA[currentGradeType];
+  const colW = 1040 / crit.length;
+  crit.forEach((c, i) => {
+    const score = scores?.[c.key] ?? 0;
+    const colCX = 80 + colW * i + colW / 2;
+
+    ctx.font = '500 20px sans-serif';
+    ctx.fillStyle = '#8fa0b4';
+    ctx.textAlign = 'center';
+    ctx.fillText(c.label, colCX, 430);
+
+    ctx.font = 'bold 34px sans-serif';
+    ctx.fillStyle = '#2a3a50';
+    ctx.fillText(`${score}/${c.max}`, colCX, 474);
+
+    if (i < crit.length - 1) {
+      ctx.strokeStyle = '#e8edf5';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(80 + colW * (i + 1), 410);
+      ctx.lineTo(80 + colW * (i + 1), 488);
+      ctx.stroke();
+    }
+  });
+
+  // サイトURL
+  ctx.font = '400 18px sans-serif';
+  ctx.fillStyle = '#b0bcc8';
+  ctx.textAlign = 'center';
+  ctx.fillText(SITE_URL, cx, 535);
+
+  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+}
+
+async function handleShareNative(total, maxTotal, scores) {
+  try {
+    const blob = await generateScoreCard(total, maxTotal, scores);
+    const file = new File([blob], 'raitapu-result.png', { type: 'image/png' });
+    await navigator.share({ files: [file], text: buildShareText(total, maxTotal) });
+  } catch {
+    // キャンセルまたは非対応 — 何もしない
+  }
+}
+
+function handleShareX(total, maxTotal) {
+  const text = buildShareText(total, maxTotal);
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+}
+
+function handleShareLine(total, maxTotal) {
+  const text = buildShareText(total, maxTotal);
+  window.open(`https://line.me/R/msg/text/?${encodeURIComponent(text)}`, '_blank', 'noopener');
+}
+
+async function handleShareCopy(total, maxTotal) {
+  const btn = $('share-copy-btn');
+  try {
+    await navigator.clipboard.writeText(buildShareText(total, maxTotal));
+    btn.textContent = '✓ コピーしました';
+    setTimeout(() => { btn.textContent = '📋 テキストをコピー'; }, 2000);
+  } catch {
+    btn.textContent = 'コピー失敗';
+  }
+}
+
+async function handleImageSave(total, maxTotal, scores) {
+  const blob = await generateScoreCard(total, maxTotal, scores);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'raitapu-result.png';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderShareSection(total, maxTotal, scores) {
+  const canNative = typeof navigator.share === 'function'
+    && typeof navigator.canShare === 'function'
+    && navigator.canShare({ files: [new File([], 'x.png', { type: 'image/png' })] });
+
+  const nativeBtn = canNative
+    ? `<button class="share-btn share-btn--native" id="share-native-btn">📤 画像でシェア</button>`
+    : '';
+
+  $('share-body').innerHTML = `
+    <div class="share-row">
+      ${nativeBtn}
+      <button class="share-btn share-btn--x" id="share-x-btn">𝕏 でシェア</button>
+      <button class="share-btn share-btn--line" id="share-line-btn">LINEで送る</button>
+      <button class="share-btn share-btn--copy" id="share-copy-btn">📋 テキストをコピー</button>
+      <button class="share-btn share-btn--img" id="share-img-btn">🖼 画像を保存</button>
+      <button class="share-btn share-btn--print" id="share-print-btn">🖨 印刷</button>
+    </div>`;
+
+  if (canNative) $('share-native-btn').addEventListener('click', () => handleShareNative(total, maxTotal, scores));
+  $('share-x-btn').addEventListener('click',    () => handleShareX(total, maxTotal));
+  $('share-line-btn').addEventListener('click', () => handleShareLine(total, maxTotal));
+  $('share-copy-btn').addEventListener('click', () => handleShareCopy(total, maxTotal));
+  $('share-img-btn').addEventListener('click',  () => handleImageSave(total, maxTotal, scores));
+  $('share-print-btn').addEventListener('click', () => window.print());
 }
 
 function toggleAdvice(btn) {
